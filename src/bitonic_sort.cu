@@ -10,7 +10,6 @@
 #include <stdio.h>
 #include <time.h>
 
-/* Every thread gets exactly one value in the unsorted array. */
 #define THREADS 512 // 2^9
 #define NIM1 13515141
 #define NIM2 13515147
@@ -33,12 +32,12 @@ void print_elapsed(clock_t start, clock_t stop)
   printf("Elapsed time: %.3fs\n", elapsed);
 }
 
-int random_float()
+int random_int()
 {
   return (int)rand();
 }
 
-void array_print(int *arr, int length) 
+void array_print(int *arr, int length)
 {
   int i;
   for (i = 0; i < length; ++i) {
@@ -52,7 +51,7 @@ void array_fill(int *arr, int length)
   srand(13515147);
   int i;
   for (i = 0; i < length; ++i) {
-    arr[i] = random_float();
+    arr[i] = random_int();
   }
 }
 
@@ -118,7 +117,7 @@ void compare(int i, int j, int dir){
   }
 }
 
-/*
+/**
  * Returns the greatest power of two number that is less than n
  */
  int greatestPowerOfTwoLessThan(int n){
@@ -127,7 +126,8 @@ void compare(int i, int j, int dir){
     k=k<<1;
   return k>>1;
 }
-/*
+
+/**
  * Sorts a bitonic sequence in ascending order if dir=1
  * otherwise in descending order
  */
@@ -142,7 +142,7 @@ void bitonicMerge(int low, int c, int dir){
   }
 }
 
-/*
+/**
  * Generates bitonic sequence by sorting recursively
  * two halves of the array in opposite sorting orders
  * bitonicMerge will merge the resultant array
@@ -157,15 +157,16 @@ void recursiveBitonic(int low, int c, int dir){
   }
 }
 
-
-
-/*
+/**
  * Sort array with serial bitonic sorting
  */
 void sort_serial(){
   recursiveBitonic(0, array_size, up);
 }
 
+/**
+ * Check if global array is sorted
+ */
 int is_sorted() {
   int i;
   for (i=0; i<array_size-1; i++) {
@@ -176,23 +177,28 @@ int is_sorted() {
 
 int main(int argc, char * argv[])
 {
+  input_file = fopen(input_path, "w");
+  output_file = fopen(output_path, "w");
   clock_t start, stop;
-
-
   array_size = atoi(argv[1]);
   NUM_VALS=array_size;
   BLOCKS=NUM_VALS/512;
   array = (int*) malloc( NUM_VALS * sizeof(int));
   array_fill(array, NUM_VALS);
+  int i;
+  for (i = 0; i < array_size; i++){
+    fprintf(input_file, "%d\n", array[i]);
+  }
+  fclose(input_file);
   start = clock();
   sort_serial();
   stop = clock();
   printf("[SERIAL]\n");
-        if (is_sorted()) {
-          printf("Sorting successful\n");
-        } else {
-          printf("Sorting failed\n");
-        }
+  if (is_sorted()) {
+    printf("Sorting successful\n");
+  } else {
+    printf("Sorting failed\n");
+  }
   print_elapsed(start, stop);
   free(array);
   array = (int*) malloc( NUM_VALS * sizeof(int));
@@ -200,13 +206,16 @@ int main(int argc, char * argv[])
   start = clock();
   bitonic_sort(array); /* Inplace */
   printf("[PARALEL]\n");
-        if (is_sorted()) {
-          printf("Sorting successful\n");
-        } else {
-          printf("Sorting failed\n");
-        }
+  if (is_sorted()) {
+    printf("Sorting successful\n");
+  } else {
+    printf("Sorting failed\n");
+  }
   stop = clock();
+  for (i = 0; i < array_size; i++){
+    fprintf(output_file, "%d\n", array[i]);
+  }
+  fclose(output_file);
 
   print_elapsed(start, stop);
 }
-

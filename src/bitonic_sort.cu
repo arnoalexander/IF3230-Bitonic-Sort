@@ -29,7 +29,7 @@ int BLOCKS;
 void print_elapsed(clock_t start, clock_t stop)
 {
   double elapsed = ((double) (stop - start)) / CLOCKS_PER_SEC;
-  printf("Elapsed time: %.3fs\n", elapsed);
+  printf("Elapsed time: %.0f microsecond\n", elapsed * 1000000.0);
 }
 
 int random_int()
@@ -205,13 +205,13 @@ int main(int argc, char * argv[])
   array_fill(array, NUM_VALS);
   start = clock();
   bitonic_sort(array); /* Inplace */
+  stop = clock();
   printf("[PARALEL]\n");
   if (is_sorted()) {
     printf("Sorting successful\n");
   } else {
     printf("Sorting failed\n");
   }
-  stop = clock();
   for (i = 0; i < array_size; i++){
     fprintf(output_file, "%d\n", array[i]);
   }
